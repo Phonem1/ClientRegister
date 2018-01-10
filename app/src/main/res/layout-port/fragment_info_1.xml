@@ -55,6 +55,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
+            android:hint="name"
             android:inputType="textPersonName" />
 
         <Space
@@ -72,6 +73,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
+            android:hint="phone no."
             android:inputType="phone" />
 
         <Space
@@ -89,6 +91,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
+            android:hint="email"
             android:inputType="textEmailAddress" />
 
         <Space
@@ -106,6 +109,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
+            android:hint="company  name"
             android:inputType="textPersonName" />
     </LinearLayout>
 

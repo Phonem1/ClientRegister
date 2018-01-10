@@ -7,51 +7,69 @@
     android:layout_height="match_parent"
     tools:layout_editor_absoluteY="81dp">
 
-    <TextView
-        android:id="@+id/tab5_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="38dp"
-        android:layout_marginTop="16dp"
-        android:text="Confirmation"
-        android:textSize="18sp"
-        app:layout_constraintBottom_toTopOf="@+id/surfaceView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center|fill"
+        android:orientation="vertical"
+        android:weightSum="11"
+        android:padding="20dp">
 
-    <SurfaceView
-        android:id="@+id/surfaceView"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginBottom="32dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginStart="30dp"
-        app:layout_constraintBottom_toTopOf="@+id/textView8"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tab5_title" />
+        <TextView
+            android:id="@+id/tab5_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="Confirmation"
+            android:textSize="18sp"
+            tools:layout_editor_absoluteX="127dp"
+            tools:layout_editor_absoluteY="16dp" />
 
-    <TextView
-        android:id="@+id/textView8"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="42dp"
-        android:text='My name is_______.\n I am from "COMPANY NAME" '
-        android:textSize="18sp"
-        app:layout_constraintBottom_toTopOf="@+id/button7"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/surfaceView" />
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
 
-    <Button
-        android:id="@+id/button7"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="89dp"
-        android:layout_marginStart="25dp"
-        android:text="\u2713 Looks good, sign me in!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/textView8"
-        app:layout_constraintTop_toBottomOf="@+id/textView8" />
+        <ImageView
+            android:id="@+id/confirmImg"
+            android:layout_width="match_parent"
+            android:layout_height="175dp"
+            android:layout_weight="5"
+            app:srcCompat="@drawable/take_your_pic"
+            tools:layout_editor_absoluteX="30dp"
+            tools:layout_editor_absoluteY="79dp" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
+
+        <TextView
+            android:id="@+id/confirmtv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:gravity="center"
+            android:text='My name is_______.\n I am from "COMPANY NAME" '
+            android:textAlignment="center"
+            android:textSize="18sp"
+            tools:layout_editor_absoluteX="59dp"
+            tools:layout_editor_absoluteY="286dp" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
+
+        <Button
+            android:id="@+id/confirmBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="\u2713 Looks good, sign me in!"
+            tools:layout_editor_absoluteX="84dp"
+            tools:layout_editor_absoluteY="374dp"
+            android:layout_weight="1"/>
+    </LinearLayout>
+
 </android.support.constraint.ConstraintLayout>

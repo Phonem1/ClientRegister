@@ -37,16 +37,22 @@
                 android:id="@+id/tabItem3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:icon="@drawable/photo_white" />
+                android:icon="@drawable/staff_white" />
 
             <android.support.design.widget.TabItem
                 android:id="@+id/tabItem4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:icon="@drawable/tc_white" />
+                android:icon="@drawable/photo_white" />
 
             <android.support.design.widget.TabItem
                 android:id="@+id/tabItem5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:icon="@drawable/tc_white" />
+
+            <android.support.design.widget.TabItem
+                android:id="@+id/tabItem6"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:icon="@drawable/tick_white" />

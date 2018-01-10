@@ -4,31 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/fragment_tc"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <TextView
-        android:id="@+id/tab4_tv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="9dp"
-        android:layout_marginTop="16dp"
-        android:text="VISITOR POLICY"
-        android:textSize="18sp"
-        app:layout_constraintBottom_toTopOf="@+id/scrollView2"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:layout_editor_absoluteX="115dp"
-        tools:layout_editor_absoluteY="16dp" />
+    android:layout_height="match_parent"
+    tools:layout_editor_absoluteY="81dp">
 
     <ScrollView
         android:id="@+id/scrollView2"
         android:layout_width="0dp"
-        android:layout_height="481dp"
-        android:layout_marginBottom="642dp"
-        app:layout_constraintBottom_toTopOf="@+id/tc_agree_btn"
+        android:layout_height="436dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tab4_tv">
 
@@ -53,14 +36,29 @@
                 android:layout_height="wrap_content"
                 android:text="@string/tc_content" />
 
-            <Button
-                android:id="@+id/tc_agree_btn"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="agree"
-                tools:layout_editor_absoluteX="20dp"
-                tools:layout_editor_absoluteY="1170dp" />
-
         </LinearLayout>
     </ScrollView>
+
+    <TextView
+        android:id="@+id/tab4_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="VISITOR POLICY"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/tc_agree_btn"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:text="agree"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
 </android.support.constraint.ConstraintLayout>
