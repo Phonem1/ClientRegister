@@ -4,7 +4,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-import com.anewtech.clientregister.PlaceholderFragment;
+import com.anewtech.clientregister.Fragment.PlaceholderFragment;
 
 /**
  * A {@link FragmentPagerAdapter} that returns a fragment corresponding to

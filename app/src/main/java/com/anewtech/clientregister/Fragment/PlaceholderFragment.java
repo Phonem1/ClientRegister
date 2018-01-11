@@ -1,14 +1,12 @@
-package com.anewtech.clientregister;
+package com.anewtech.clientregister.Fragment;
 
 import android.Manifest;
-import android.app.AlertDialog;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Matrix;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
@@ -16,10 +14,8 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
-import android.text.Html;
+import android.support.v4.widget.Space;
 import android.util.Log;
-import android.util.SparseArray;
-import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,14 +25,13 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.anewtech.clientregister.Adapter.CustomViewAdapter;
 import com.anewtech.clientregister.Model.ClientInfoModel;
 import com.anewtech.clientregister.Model.StaffDataModel;
+import com.anewtech.clientregister.R;
 import com.anewtech.clientregister.Service.StaffDataService;
-
-import java.io.IOException;
+import com.anewtech.clientregister.SignOutActivity;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -51,12 +46,9 @@ public class PlaceholderFragment extends Fragment {
      */
     private static final String ARG_SECTION_NUMBER = "section_number";
     public static final int MY_PERMISSIONS_REQUEST_CAMERA = 100;
-    static final int REQUEST_IMAGE_CAPTURE = 1;
-    private Context context;
+    public static final int REQUEST_IMAGE_CAPTURE = 1;
 
     public View rootView = null;
-    private StaffDataModel sm = new StaffDataModel();
-    private StaffDataService sds;
     private CustomViewAdapter cva = CustomViewAdapter.getInstance();
     public static ClientInfoModel cim = ClientInfoModel.getInstance();
 
@@ -111,21 +103,68 @@ public class PlaceholderFragment extends Fragment {
         return rootView;
     }
     private void initialiseUI(@NonNull final View mainView){
-        context = cva.getContext();
 
         //Tab 1...
+        final TextView tab1title = mainView.findViewById(R.id.tab1_title);
+        if(tab1title != null){
+            if(cim.isSignedIn().get(1)){
+                tab1title.setTextSize(30f);
+                tab1title.setText("Mr/Ms "+cim.getName()+" from "+cim.getCompanyName()+"\n is currently signed in.");
+            }else{
+                tab1title.setTextSize(50f);
+                tab1title.setText("Welcome!");
+            }
+        }
+
         Button signIn = mainView.getRootView().findViewById(R.id.sign_in_btn);
         if(signIn != null){
             signIn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     Log.e("xxx", "Sign in test...");
+                    cim.setSignedIn(0,true);
                     TabLayout tab = mainView.getRootView().findViewById(R.id.tabs);
                     if (tab != null) {
                         tab.getTabAt(1).select();
                     }
                 }
             });
+            if(cim.isSignedIn().get(1)){
+                signIn.setVisibility(View.GONE);
+            }else{
+                signIn.setVisibility(View.VISIBLE);
+            }
+        }
+
+        Button signOut = mainView.findViewById(R.id.sign_out_btn);
+        if(signOut != null){
+            signOut.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    cim.setSignedIn(1,false);
+
+                    Intent intent = new Intent(getContext(), SignOutActivity.class);
+                    intent.putExtra("name", cim.getName());
+                    intent.putExtra("email", cim.getEmail());
+                    intent.putExtra("phoneno", cim.getPhoneNo());
+                    intent.putExtra("company", cim.getCompanyName());
+                    startActivity(intent);
+                }
+            });
+            if(!cim.isSignedIn().get(1)){
+                signOut.setClickable(false);
+            }else{
+                signOut.setClickable(true);
+            }
+        }
+
+        android.widget.Space tab1space = (android.widget.Space) mainView.findViewById(R.id.tab1space);
+        if(tab1space != null){
+            if(cim.isSignedIn().get(1)){
+                tab1space.setVisibility(View.GONE);
+            }else{
+                tab1space.setVisibility(View.VISIBLE);
+            }
         }
 
         //Tab 2...
@@ -216,7 +255,6 @@ public class PlaceholderFragment extends Fragment {
             });
         }
 
-
         if(nextPhotoBtn != null){
             nextPhotoBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -224,8 +262,6 @@ public class PlaceholderFragment extends Fragment {
                     TabLayout tab = mainView.getRootView().findViewById(R.id.tabs);
                     if(tab != null){
                         tab.getTabAt(4).select();
-                        toLog("infomodel - phone no.:"+cim.getPhoneNo());
-                        toLog("infomodel - staff seeking: "+cim.getStaffSeeking());
                     }
                 }
             });
@@ -247,7 +283,7 @@ public class PlaceholderFragment extends Fragment {
                     TabLayout tab = mainView.getRootView().findViewById(R.id.tabs);
                     if(tab != null){
                         tab.getTabAt(5).select();
-                        toLog("infomodel - company name:"+cim.getCompanyName());
+//                        toLog("infomodel - company name:"+cim.getCompanyName()); //Able to get data after implementing Singleton design pattern for cim
                     }
                 }
             });
@@ -257,13 +293,30 @@ public class PlaceholderFragment extends Fragment {
         ImageView confirmImg = mainView.findViewById(R.id.confirmImg);
         if(confirmImg != null){
             if(cim.getPhotoId() != null){
-                confirmImg.setImageBitmap(Bitmap.createScaledBitmap(cim.getPhotoId(), 1080, 620, false));
+                confirmImg.setImageBitmap(Bitmap.createScaledBitmap(cim.getPhotoId(), 960, 560, false));
+//                confirmImg.setImageBitmap(getResizedBitmap(cim.getPhotoId(),960,560));
             }
         }
+
         TextView confirmtv = mainView.findViewById(R.id.confirmtv);
         if(confirmtv != null){
             String confirmMsg = "My name is "+cim.getName()+". I am from "+cim.getCompanyName()+".\n I am looking for "+cim.getStaffSeeking()+".";
             confirmtv.setText(confirmMsg);
+        }
+
+        Button confirmBtn = mainView.findViewById(R.id.confirmBtn);
+        if(confirmBtn != null){
+            confirmBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    cim.setSignedIn(1,true);
+                    cim.setSignedIn(0,false);
+                    TabLayout tab = mainView.getRootView().findViewById(R.id.tabs);
+                    if(tab != null){
+                        tab.getTabAt(0).select();
+                    }
+                }
+            });
         }
     }
 
@@ -272,6 +325,7 @@ public class PlaceholderFragment extends Fragment {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             Bundle extras = data.getExtras();
             Bitmap imageBitmap = (Bitmap) extras.get("data");
+//            Bitmap resizedBitmap = getResizedBitmap(imageBitmap,960,640);
             cim.setPhotoId(imageBitmap);
             clientImg.setImageBitmap(imageBitmap);
             isPhotoTaken = true;

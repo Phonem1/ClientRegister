@@ -13,17 +13,11 @@ import java.util.List;
  */
 
 public class StaffDataService {
-    private String jsonData;
     private Gson g;
     private StaffDataModel sm;
-    private StaffDetails sd;
 
     public StaffDataService(){
         g = new Gson();
-    }
-
-    public String getJsonData(){
-        return this.jsonData;
     }
 
     public void setJsonData(String requiredJson){

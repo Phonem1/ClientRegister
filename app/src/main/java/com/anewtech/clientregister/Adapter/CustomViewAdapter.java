@@ -54,10 +54,6 @@ public class CustomViewAdapter extends BaseAdapter {
         this.staffnames = staffnames;
     }
 
-    public Context getContext() {
-        return context;
-    }
-
     @Override
     public int getCount() {
         return staffnames.size();

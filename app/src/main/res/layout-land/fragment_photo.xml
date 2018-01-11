@@ -10,8 +10,9 @@
     <TextView
         android:id="@+id/tab3_title"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
         android:layout_marginBottom="16dp"
+        android:gravity="center"
         android:text="TAKE A PHOTO"
         android:textSize="18sp"
         app:layout_constraintBottom_toTopOf="@+id/clientImg"

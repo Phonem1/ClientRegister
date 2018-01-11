@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 
 import com.anewtech.clientregister.Adapter.CustomViewAdapter;
 import com.anewtech.clientregister.Adapter.SectionsPagerAdapter;
+import com.anewtech.clientregister.Fragment.PlaceholderFragment;
 import com.anewtech.clientregister.Model.ClientInfoModel;
 import com.anewtech.clientregister.Model.StaffDetails;
 import com.anewtech.clientregister.Service.Api;
@@ -18,6 +19,7 @@ import com.anewtech.clientregister.Service.StaffDataService;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import okhttp3.ResponseBody;
@@ -41,11 +43,9 @@ public class MainActivity extends AppCompatActivity {
      * The {@link ViewPager} that will host the section contents.
      */
     private ViewPager mViewPager;
-    private LayoutInflater inflater;
     private TabLayout tabLayout;
     private CustomViewAdapter cva;
     private StaffDataService sds;
-    private PlaceholderFragment fragment;
     private ClientInfoModel cim = ClientInfoModel.getInstance();
 
     private List<StaffDetails> details;
@@ -70,8 +70,6 @@ public class MainActivity extends AppCompatActivity {
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
 
-        LayoutInflater inflater = LayoutInflater.from(getBaseContext());
-
         sds = new StaffDataService();
         sds.setJsonData(loadJsonFromAsset());
         sds.toLog();
@@ -82,8 +80,24 @@ public class MainActivity extends AppCompatActivity {
         cva.initialize(this, details); //pass to load ListView items -> setAdapter()
         cva.setPm(getPackageManager()); //pass to
 
+        //Reset client model to null
+        cim.setName(null);
+        cim.setEmail(null);
+        cim.setPhoneNo(null);
+        cim.setCompanyName(null);
+        cim.setStaffSeeking(null);
+        cim.setPhotoId(null);
+        cim.setSignedIn(0,false);
+        cim.setSignedIn(1,false);
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if(cim.isSignedIn().get(1) && !cim.isSignedIn().get(0)){
+            finish();
+        }
+    }
 
     public void getJsonRetrofit(){
         Retrofit retrofit = new Retrofit.Builder()
@@ -108,6 +122,10 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+//    public ArrayList loadStaffImgFromStrg(){
+//
+//    }
 
     public String loadJsonFromAsset(){
         String json = null;
