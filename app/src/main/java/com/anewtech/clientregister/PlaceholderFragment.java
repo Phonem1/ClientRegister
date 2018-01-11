@@ -1,7 +1,10 @@
 package com.anewtech.clientregister;
 
+import android.Manifest;
+import android.app.AlertDialog;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -10,6 +13,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.text.Html;
@@ -25,11 +29,14 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.anewtech.clientregister.Adapter.CustomViewAdapter;
 import com.anewtech.clientregister.Model.ClientInfoModel;
 import com.anewtech.clientregister.Model.StaffDataModel;
 import com.anewtech.clientregister.Service.StaffDataService;
+
+import java.io.IOException;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -43,6 +50,7 @@ public class PlaceholderFragment extends Fragment {
      * fragment.
      */
     private static final String ARG_SECTION_NUMBER = "section_number";
+    public static final int MY_PERMISSIONS_REQUEST_CAMERA = 100;
     static final int REQUEST_IMAGE_CAPTURE = 1;
     private Context context;
 
@@ -103,6 +111,7 @@ public class PlaceholderFragment extends Fragment {
         return rootView;
     }
     private void initialiseUI(@NonNull final View mainView){
+        context = cva.getContext();
 
         //Tab 1...
         Button signIn = mainView.getRootView().findViewById(R.id.sign_in_btn);
@@ -193,8 +202,16 @@ public class PlaceholderFragment extends Fragment {
             takePhoto.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    dispatchTakePictureIntent();
-                    nextPhotoBtn.setVisibility(View.VISIBLE);
+                    try{
+                        dispatchTakePictureIntent();
+                        nextPhotoBtn.setVisibility(View.VISIBLE);
+                    }catch (Exception e){
+                        ActivityCompat.requestPermissions(getActivity(),
+                                new String[]{Manifest.permission.CAMERA},
+                                MY_PERMISSIONS_REQUEST_CAMERA);
+                        toLog(e.getMessage());
+                    }
+
                 }
             });
         }
@@ -239,7 +256,9 @@ public class PlaceholderFragment extends Fragment {
         //...and set UI for Tab 6.
         ImageView confirmImg = mainView.findViewById(R.id.confirmImg);
         if(confirmImg != null){
-            confirmImg.setImageBitmap(Bitmap.createScaledBitmap(cim.getPhotoId(), 1080, 620, false));
+            if(cim.getPhotoId() != null){
+                confirmImg.setImageBitmap(Bitmap.createScaledBitmap(cim.getPhotoId(), 1080, 620, false));
+            }
         }
         TextView confirmtv = mainView.findViewById(R.id.confirmtv);
         if(confirmtv != null){
@@ -270,47 +289,4 @@ public class PlaceholderFragment extends Fragment {
         Log.e("fragment", msg);
     }
 
-
-
-
-//    public void setCim(ClientInfoModel cim){
-//        this.cim = cim;
-//    }
-
-//    public void getCVA(CustomViewAdapter customViewAdapter){
-//        cva = customViewAdapter;
-//    }
-//    public void getDetails(Context c, List<StaffDetails> details){
-//        this.context = c;
-//        getSDObservable(details)
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(getSDObserver());
-//    }
-//    private Observable<List<StaffDetails>> getSDObservable(List<StaffDetails> details){
-//        return Observable.just(details);
-//    }
-//    private Observer<List<StaffDetails>> getSDObserver() {
-//        return new Observer<List<StaffDetails>>() {
-//            @Override
-//            public void onSubscribe(Disposable d) {
-//
-//            }
-//
-//            @Override
-//            public void onNext(List<StaffDetails> staffDetails) {
-//                cva = new CustomViewAdapter(context, staffDetails);
-//            }
-//
-//            @Override
-//            public void onError(Throwable e) {
-//
-//            }
-//
-//            @Override
-//            public void onComplete() {
-//                toLog("observer complete!");
-//            }
-//        };
-//    }
 }
