@@ -1,6 +1,11 @@
 package com.anewtech.clientregister;
 
+import android.content.Context;
+import android.content.ContextWrapper;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.design.widget.TabLayout;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 
 import android.support.v4.app.FragmentPagerAdapter;
@@ -17,6 +22,10 @@ import com.anewtech.clientregister.Model.StaffDetails;
 import com.anewtech.clientregister.Service.Api;
 import com.anewtech.clientregister.Service.StaffDataService;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -122,10 +131,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
-//    public ArrayList loadStaffImgFromStrg(){
-//
-//    }
 
     public String loadJsonFromAsset(){
         String json = null;

@@ -1,18 +1,24 @@
 package com.anewtech.clientregister.Fragment;
 
 import android.Manifest;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.Space;
 import android.util.Log;
@@ -33,6 +39,12 @@ import com.anewtech.clientregister.R;
 import com.anewtech.clientregister.Service.StaffDataService;
 import com.anewtech.clientregister.SignOutActivity;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
 import static android.app.Activity.RESULT_OK;
 
 /**
@@ -48,12 +60,13 @@ public class PlaceholderFragment extends Fragment {
     public static final int MY_PERMISSIONS_REQUEST_CAMERA = 100;
     public static final int REQUEST_IMAGE_CAPTURE = 1;
 
-    public View rootView = null;
     private CustomViewAdapter cva = CustomViewAdapter.getInstance();
     public static ClientInfoModel cim = ClientInfoModel.getInstance();
 
     private EditText name, email, phoneNo, companyName;
+    public View rootView = null;
     private ImageView clientImg;
+
     private boolean isPhotoTaken;
 
     public PlaceholderFragment() {
@@ -70,6 +83,12 @@ public class PlaceholderFragment extends Fragment {
         args.putInt(ARG_SECTION_NUMBER, sectionNumber);
         fragment.setArguments(args);
         return fragment;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setRetainInstance(true);
     }
 
     @Override
@@ -272,6 +291,10 @@ public class PlaceholderFragment extends Fragment {
             if(isPhotoTaken){
                 clientImg.setImageBitmap(cim.getPhotoId());
             }
+            if(cim.getPhotoId() != null){
+                clientImg.setImageBitmap(Bitmap.createScaledBitmap(cim.getPhotoId(), 960, 960, false));
+            }
+
         }
 
         //Tab5...
@@ -293,8 +316,8 @@ public class PlaceholderFragment extends Fragment {
         ImageView confirmImg = mainView.findViewById(R.id.confirmImg);
         if(confirmImg != null){
             if(cim.getPhotoId() != null){
-                confirmImg.setImageBitmap(Bitmap.createScaledBitmap(cim.getPhotoId(), 960, 560, false));
-//                confirmImg.setImageBitmap(getResizedBitmap(cim.getPhotoId(),960,560));
+//                confirmImg.setImageBitmap(Bitmap.createScaledBitmap(cim.getPhotoId(), 960, 960, false));
+                confirmImg.setImageDrawable(cropBitmapToRound(cim.getPhotoId()));
             }
         }
 
@@ -320,14 +343,87 @@ public class PlaceholderFragment extends Fragment {
         }
     }
 
+    private RoundedBitmapDrawable cropBitmapToRound(Bitmap bm){
+//        Bitmap imageBitmap=BitmapFactory.decodeResource(getResources(),  R.drawable.theenigma_pp); //get bitmap from resources drawable
+        Bitmap image = Bitmap.createScaledBitmap(bm, 960, 960, false);
+        RoundedBitmapDrawable roundedBitmapDrawable= RoundedBitmapDrawableFactory.create(getResources(), image);
+
+//setting radius
+        roundedBitmapDrawable.setCornerRadius(470.0f);
+        roundedBitmapDrawable.setAntiAlias(true);
+        return roundedBitmapDrawable;
+    }
+
+    private Bitmap cropBitmapToSq(Bitmap srcBmp){
+        Bitmap dstBmp;
+        if (srcBmp.getWidth() >= srcBmp.getHeight()){
+
+            dstBmp = Bitmap.createBitmap(
+                    srcBmp,
+                    srcBmp.getWidth()/2 - srcBmp.getHeight()/2,
+                    0,
+                    srcBmp.getHeight(),
+                    srcBmp.getHeight()
+            );
+
+        }else{
+
+            dstBmp = Bitmap.createBitmap(
+                    srcBmp,
+                    0,
+                    srcBmp.getHeight()/2 - srcBmp.getWidth()/2,
+                    srcBmp.getWidth(),
+                    srcBmp.getWidth()
+            );
+        }
+
+        Bitmap image = Bitmap.createScaledBitmap(dstBmp, 960, 960, false);
+        return image;
+    }
+
+    private String saveToInternalStorage(Bitmap bitmapImage, String imageName){
+        ContextWrapper cw = new ContextWrapper(getContext());
+        //path tp /data/data/yourapp/app_data/imageDir
+        File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
+        //create imageDir
+        File mypath = new File(directory, imageName+".jpg");
+
+        FileOutputStream fos = null;
+        try{
+            fos = new FileOutputStream(mypath);
+            //use the compress method on the Bitmap object to write image to the OutputStream
+            bitmapImage.compress(Bitmap.CompressFormat.PNG, 100, fos);
+        }catch(Exception e){
+            e.printStackTrace();
+        }finally {
+            try{
+                fos.close();
+            }catch (IOException e){
+                e.printStackTrace();
+            }
+        }
+        return directory.getAbsolutePath();
+    }
+
+    public void loadStaffImgFromStrg(String path, String imageName){
+        try{
+            File f = new File(path, imageName+".jpg");
+            Bitmap b = BitmapFactory.decodeStream(new FileInputStream(f));
+
+        }catch(FileNotFoundException e){
+            e.printStackTrace();
+        }
+    }
+
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             Bundle extras = data.getExtras();
             Bitmap imageBitmap = (Bitmap) extras.get("data");
-//            Bitmap resizedBitmap = getResizedBitmap(imageBitmap,960,640);
-            cim.setPhotoId(imageBitmap);
-            clientImg.setImageBitmap(imageBitmap);
+            Bitmap croppedBitmap = cropBitmapToSq(imageBitmap);
+            cim.setPhotoId(croppedBitmap);
+            clientImg.setImageBitmap(croppedBitmap); //it is setting img but still reset when rotate
             isPhotoTaken = true;
         }
     }
