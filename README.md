@@ -1,3 +1,3 @@
 # ClientRegister
 
-Currently trying to display image for staff available
+Done with loading images locally as staff icons, needs to optimize codes to make app smoother.
