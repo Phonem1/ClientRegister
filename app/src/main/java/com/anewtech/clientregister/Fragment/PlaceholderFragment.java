@@ -10,6 +10,8 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.media.MediaScannerConnection;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
@@ -68,6 +70,9 @@ public class PlaceholderFragment extends Fragment {
     private ImageView clientImg;
 
     private boolean isPhotoTaken;
+    private String filename;
+    private String filepath = "StaffPhoto";
+    private File myExternalFile;
 
     public PlaceholderFragment() {
 
@@ -380,41 +385,6 @@ public class PlaceholderFragment extends Fragment {
         Bitmap image = Bitmap.createScaledBitmap(dstBmp, 960, 960, false);
         return image;
     }
-
-    private String saveToInternalStorage(Bitmap bitmapImage, String imageName){
-        ContextWrapper cw = new ContextWrapper(getContext());
-        //path tp /data/data/yourapp/app_data/imageDir
-        File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
-        //create imageDir
-        File mypath = new File(directory, imageName+".jpg");
-
-        FileOutputStream fos = null;
-        try{
-            fos = new FileOutputStream(mypath);
-            //use the compress method on the Bitmap object to write image to the OutputStream
-            bitmapImage.compress(Bitmap.CompressFormat.PNG, 100, fos);
-        }catch(Exception e){
-            e.printStackTrace();
-        }finally {
-            try{
-                fos.close();
-            }catch (IOException e){
-                e.printStackTrace();
-            }
-        }
-        return directory.getAbsolutePath();
-    }
-
-    public void loadStaffImgFromStrg(String path, String imageName){
-        try{
-            File f = new File(path, imageName+".jpg");
-            Bitmap b = BitmapFactory.decodeStream(new FileInputStream(f));
-
-        }catch(FileNotFoundException e){
-            e.printStackTrace();
-        }
-    }
-
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {

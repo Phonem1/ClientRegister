@@ -4,6 +4,9 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.MediaScannerConnection;
+import android.net.Uri;
+import android.os.Environment;
 import android.support.design.widget.TabLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -88,6 +91,8 @@ public class MainActivity extends AppCompatActivity {
         cva.setInitial(true);
         cva.initialize(this, details); //pass to load ListView items -> setAdapter()
         cva.setPm(getPackageManager()); //pass to
+        cva.getResources(getResources());
+        loadStaffImgFromStrg("StaffImages");
 
         //Reset client model to null
         cim.setName(null);
@@ -98,6 +103,14 @@ public class MainActivity extends AppCompatActivity {
         cim.setPhotoId(null);
         cim.setSignedIn(0,false);
         cim.setSignedIn(1,false);
+
+        checkForImgFile("staff_black", "jackBlack");
+        checkForImgFile("theenigma_pp","image1");
+        if(!fileExistsInSD("jackBlack.png")){
+            toLog("File doesn't exist");
+        }else{
+            toLog("File exist");
+        }
     }
 
     @Override
@@ -147,6 +160,84 @@ public class MainActivity extends AppCompatActivity {
         }
         Log.e("xxx", json);
         return json;
+    }
+
+    private static final String APP_SD_PATH = "/Android/data/com.anewtech.clientregister ";
+
+    public boolean fileExistsInSD(String sFileName){
+        String sFolder = Environment.getExternalStorageDirectory().toString() +
+                APP_SD_PATH + "/StaffImages";
+        String sFile=sFolder+"/"+sFileName;
+        java.io.File file = new java.io.File(sFile);
+        return file.exists();
+    }
+
+    private void checkForImgFile(String resourceName, String imageName){
+        File file = new File("/StaffImages/c");
+        if(!file.exists()){
+            //Do something
+            toLog("File doesn't exist.");
+            int id = getBaseContext().getResources().getIdentifier(resourceName,"drawable", getPackageName());
+            Bitmap bitmap = BitmapFactory.decodeResource(getResources(), id);
+            saveToInternalStorage(bitmap, imageName);
+        }
+        else{
+            //Nothing
+            toLog("Files exists.");
+        }
+    }
+
+    private void saveToInternalStorage(Bitmap bitmapImage, String imageName){
+        //create StaffImages
+        File mypath = new File(getExternalFilesDir("StaffImages"), imageName+".png");
+
+        FileOutputStream fos = null;
+        try{
+            fos = new FileOutputStream(mypath);
+            //use the compress method on the Bitmap object to write image to the OutputStream
+            bitmapImage.compress(Bitmap.CompressFormat.PNG, 100, fos);
+        }catch(Exception e){
+            e.printStackTrace();
+        }finally {
+            try{
+                fos.close();
+            }catch (IOException e){
+                e.printStackTrace();
+            }
+        }
+
+        // Tell the media scanner about the new file so that it is
+        // immediately available to the user.
+        MediaScannerConnection.scanFile(getApplicationContext(), new String[]{mypath.toString()}, null,
+                new MediaScannerConnection.OnScanCompletedListener() {
+                    @Override
+                    public void onScanCompleted(String path, Uri uri) {
+                        toLog("Scanned " + path + ":");
+                        toLog("-> uri=" + uri);
+                    }
+                });
+
+//        return directory.getAbsolutePath();
+    }
+
+    public void loadStaffImgFromStrg(String path){
+        String img = "";
+        File directory = new File(String.valueOf(getExternalFilesDir(path)));
+
+        //Get name of images
+        File[] files = directory.listFiles();
+        int fileCount = files.length;
+        ArrayList<String> images = new ArrayList<>();
+        for(File file : files){
+            String imagenm = file.getName();
+            images.add(imagenm);
+        }
+        cva.getListofNames(images);
+        if(directory.exists()){
+            cva.getFileDir(directory);
+        }else{
+            toLog("directory doesn't exist!");
+        }
     }
 
     private void toLog(String msg){
