@@ -229,7 +229,7 @@ public class PlaceholderFragment extends Fragment {
         if(staffList != null){
             if(cva != null){
                 staffList.setAdapter(cva);
-                toLog("Adapter set!");
+//                toLog("Adapter set!");
             }
             staffList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override

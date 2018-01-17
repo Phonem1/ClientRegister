@@ -7,15 +7,15 @@
   "details": [
     {
       "id": "001",
-      "name": "Terrence Teo",
-      "phoneno": "12345678",
-      "email": "terence@anewtech.com.sg"
-    },
-    {
-      "id": "002",
       "name": "Jack Black",
       "phoneno": "12345678",
       "email": "Jack@black.com"
+    },
+    {
+      "id": "002",
+      "name": "Terence Teo",
+      "phoneno": "12345678",
+      "email": "terence@anewtech.com.sg"
     }
   ]
 }

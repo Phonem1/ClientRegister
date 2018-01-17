@@ -7,6 +7,11 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Process;
+import android.provider.MediaStore;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
@@ -20,8 +25,10 @@ import android.widget.TextView;
 
 import com.anewtech.clientregister.Model.StaffDetails;
 import com.anewtech.clientregister.R;
+import com.squareup.picasso.Picasso;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -31,6 +38,10 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 
 import io.reactivex.Observable;
+import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created by heriz on 9/1/2018.
@@ -61,12 +72,16 @@ public class CustomViewAdapter extends BaseAdapter {
 
     private Context context;
     private List<StaffDetails> staffnames;
+
     private int mSelectedItem;
     private boolean initial;
     private PackageManager pm;
     private Resources resources;
     private File directory;
     private ArrayList<String> imgNoNamae;
+
+    private ViewHolder holder;
+    String img = "";
 
     public void initialize(Context c, List<StaffDetails> staffnames){
         this.context = c;
@@ -93,7 +108,7 @@ public class CustomViewAdapter extends BaseAdapter {
     }
 
     public int getmSelectedItem() {
-        return mSelectedItem;
+        return mSelectedItem; // is used for shading(item selected)
     }
 
     public void setmSelectedItem(int mSelectedItem) {
@@ -101,7 +116,7 @@ public class CustomViewAdapter extends BaseAdapter {
     }
 
     public boolean isInitial() {
-        return initial;
+        return initial; // is used for shading(item selected)
     }
 
     public void setInitial(boolean initial) {
@@ -116,9 +131,16 @@ public class CustomViewAdapter extends BaseAdapter {
         this.pm = pm; // Get from Activity
     }
 
+    public void getFileDir(File dir){
+        directory = dir;
+    }
+
+    public void getResources(Resources res){
+        resources = res;
+    }
+
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
-        ViewHolder holder;
         if(view == null){
             view = LayoutInflater.from(context).inflate(R.layout.fragment_staff_details, null);
             holder = new ViewHolder(view);
@@ -135,91 +157,27 @@ public class CustomViewAdapter extends BaseAdapter {
         }
         holder.staffname.setText(this.staffnames.get(i).name);
 
-//        Bitmap bm = BitmapFactory.decodeResource(resources, R.drawable.staff_black);
-//        if(this.staffnames.get(i).name.equals("Jack Black")){
-////            holder.staffImg.setImageBitmap(bm);
-//            holder.staffImg.setImageBitmap(imageBM);
-//        }
-
-        String img = "";
         for(int j =0; j < imgNoNamae.size(); j++){
+            // This loop prevents indexOutOfBound error
+            final int index = j;
+
             if(j == i){
-                img = imgNoNamae.get(j);
+                img = imgNoNamae.get(i);
+
+                File f = new File("/storage/emulated/0/Android/data/com.anewtech.clientregister/files/StaffImages/"+img);
+                Picasso.with(context).load(f).into(holder.staffImg);
             }
         }
-
-        //Get image based on name
-        File file = new File(directory, img);
-        FileInputStream inStream = null;
-        try{
-            inStream = new FileInputStream(file);
-            try{
-                Bitmap bitomape = BitmapFactory.decodeStream(inStream);
-                Bitmap croppedBm = cropBitmapToSq(bitomape);
-                holder.staffImg.setImageDrawable(cropBitmapToRound(croppedBm));
-            }finally {
-                inStream.close();
-            }
-        }catch(IOException fnfe){
-            toLog(fnfe.getMessage());
-        }
-
-
 
         return view;
-    }
-
-    private RoundedBitmapDrawable cropBitmapToRound(Bitmap bm){
-//        Bitmap imageBitmap=BitmapFactory.decodeResource(getResources(),  R.drawable.theenigma_pp); //get bitmap from resources drawable
-        Bitmap image = Bitmap.createScaledBitmap(bm, 400, 400, false);
-        RoundedBitmapDrawable roundedBitmapDrawable= RoundedBitmapDrawableFactory.create(resources, image);
-
-//setting radius
-        roundedBitmapDrawable.setCornerRadius(200.0f);
-        roundedBitmapDrawable.setAntiAlias(true);
-        return roundedBitmapDrawable;
-    }
-
-    private Bitmap cropBitmapToSq(Bitmap srcBmp){
-        Bitmap dstBmp;
-        if (srcBmp.getWidth() >= srcBmp.getHeight()){
-
-            dstBmp = Bitmap.createBitmap(
-                    srcBmp,
-                    srcBmp.getWidth()/2 - srcBmp.getHeight()/2,
-                    0,
-                    srcBmp.getHeight(),
-                    srcBmp.getHeight()
-            );
-
-        }else{
-
-            dstBmp = Bitmap.createBitmap(
-                    srcBmp,
-                    0,
-                    srcBmp.getHeight()/2 - srcBmp.getWidth()/2,
-                    srcBmp.getWidth(),
-                    srcBmp.getWidth()
-            );
-        }
-
-        Bitmap image = Bitmap.createScaledBitmap(dstBmp, 400, 400, false);
-        return image;
-    }
-
-    public void getResources(Resources res){
-        resources = res;
     }
 
     public void getListofNames(ArrayList<String> names){
         imgNoNamae = names;
     }
 
-    public void getFileDir(File dir){
-        directory = dir;
-    }
-
     private void toLog(String msg){
         Log.e("cva", msg);
     }
+
 }

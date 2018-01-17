@@ -4,11 +4,15 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Environment;
 import android.support.design.widget.TabLayout;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.app.AppCompatActivity;
 
 import android.support.v4.app.FragmentPagerAdapter;
@@ -32,6 +36,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import okhttp3.ResponseBody;
@@ -86,15 +92,18 @@ public class MainActivity extends AppCompatActivity {
         sds.setJsonData(loadJsonFromAsset());
         sds.toLog();
 
+        checkForImgFile("theenigma_pp","image1");
+        checkForImgFile("staff_black", "jackBlack");
+
         details = sds.getDetailsList();
         cva = CustomViewAdapter.getInstance();
         cva.setInitial(true);
-        cva.initialize(this, details); //pass to load ListView items -> setAdapter()
-        cva.setPm(getPackageManager()); //pass to
+        cva.initialize(this, details);
+        cva.setPm(getPackageManager());
         cva.getResources(getResources());
         loadStaffImgFromStrg("StaffImages");
 
-        //Reset client model to null
+        //Reset client model to null, since it's a singleton
         cim.setName(null);
         cim.setEmail(null);
         cim.setPhoneNo(null);
@@ -104,13 +113,11 @@ public class MainActivity extends AppCompatActivity {
         cim.setSignedIn(0,false);
         cim.setSignedIn(1,false);
 
-        checkForImgFile("staff_black", "jackBlack");
-        checkForImgFile("theenigma_pp","image1");
-        if(!fileExistsInSD("jackBlack.png")){
-            toLog("File doesn't exist");
-        }else{
-            toLog("File exist");
-        }
+//        if(!fileExistsInSD("jackBlack.png")){
+//            toLog("File doesn't exist");
+//        }else{
+//            toLog("File exist");
+//        }
     }
 
     @Override
@@ -121,6 +128,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    //Get json from internet
     public void getJsonRetrofit(){
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(URL)
@@ -187,15 +195,42 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private Bitmap cropBitmapToSq(Bitmap srcBmp){
+        Bitmap dstBmp;
+        if (srcBmp.getWidth() >= srcBmp.getHeight()){
+
+            dstBmp = Bitmap.createBitmap(
+                    srcBmp,
+                    srcBmp.getWidth()/2 - srcBmp.getHeight()/2,
+                    0,
+                    srcBmp.getHeight(),
+                    srcBmp.getHeight()
+            );
+
+        }else{
+
+            dstBmp = Bitmap.createBitmap(
+                    srcBmp,
+                    0,
+                    srcBmp.getHeight()/2 - srcBmp.getWidth()/2,
+                    srcBmp.getWidth(),
+                    srcBmp.getWidth()
+            );
+        }
+
+        Bitmap image = Bitmap.createScaledBitmap(dstBmp, 400, 400, false);
+        return image;
+    }
+
     private void saveToInternalStorage(Bitmap bitmapImage, String imageName){
         //create StaffImages
         File mypath = new File(getExternalFilesDir("StaffImages"), imageName+".png");
-
+        Bitmap cropSq = cropBitmapToSq(bitmapImage);
         FileOutputStream fos = null;
         try{
             fos = new FileOutputStream(mypath);
             //use the compress method on the Bitmap object to write image to the OutputStream
-            bitmapImage.compress(Bitmap.CompressFormat.PNG, 100, fos);
+            cropSq.compress(Bitmap.CompressFormat.PNG, 100, fos);
         }catch(Exception e){
             e.printStackTrace();
         }finally {
@@ -220,13 +255,13 @@ public class MainActivity extends AppCompatActivity {
 //        return directory.getAbsolutePath();
     }
 
+    //Pass to custom view adapter for staff image
     public void loadStaffImgFromStrg(String path){
         String img = "";
         File directory = new File(String.valueOf(getExternalFilesDir(path)));
 
         //Get name of images
         File[] files = directory.listFiles();
-        int fileCount = files.length;
         ArrayList<String> images = new ArrayList<>();
         for(File file : files){
             String imagenm = file.getName();
