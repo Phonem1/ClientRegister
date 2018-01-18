@@ -24,6 +24,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.anewtech.clientregister.Model.StaffDetails;
+import com.anewtech.clientregister.Model.VisitorModel;
 import com.anewtech.clientregister.R;
 import com.squareup.picasso.Picasso;
 
@@ -72,9 +73,11 @@ public class CustomViewAdapter extends BaseAdapter {
 
     private Context context;
     private List<StaffDetails> staffnames;
+    private List<VisitorModel> hostdetails;
 
     private int mSelectedItem;
     private boolean initial;
+    private boolean isLoadedLocally = false;
     private PackageManager pm;
     private Resources resources;
     private File directory;
@@ -86,6 +89,10 @@ public class CustomViewAdapter extends BaseAdapter {
     public void initialize(Context c, List<StaffDetails> staffnames){
         this.context = c;
         this.staffnames = staffnames;
+    }
+
+    public void initialize( List<VisitorModel> hostdetails){
+        this.hostdetails = hostdetails;
     }
 
     @Override
@@ -155,17 +162,32 @@ public class CustomViewAdapter extends BaseAdapter {
         }else{
             view.setBackgroundColor(ContextCompat.getColor(context, R.color.lightGray));
         }
-        holder.staffname.setText(this.staffnames.get(i).name);
 
-        for(int j =0; j < imgNoNamae.size(); j++){
-            // This loop prevents indexOutOfBound error
-            final int index = j;
+        //staffnames from local json
+        if(isLoadedLocally) {
+            if (staffnames != null) {
+                holder.staffname.setText(this.staffnames.get(i).name);
+            }
 
-            if(j == i){
-                img = imgNoNamae.get(i);
 
-                File f = new File("/storage/emulated/0/Android/data/com.anewtech.clientregister/files/StaffImages/"+img);
-                Picasso.with(context).load(f).into(holder.staffImg);
+            //imgname from local img
+            if (imgNoNamae != null) {
+                for (int j = 0; j < imgNoNamae.size(); j++) {
+                    // This loop prevents indexOutOfBound error
+                    final int index = j;
+
+                    if (j == i) {
+                        img = imgNoNamae.get(i);
+
+                        File f = new File("/storage/emulated/0/Android/data/com.anewtech.clientregister/files/StaffImages/" + img);
+                        Picasso.with(context).load(f).into(holder.staffImg);
+                    }
+                }
+            }
+        }else {
+            //host details from db
+            if (hostdetails != null) {
+
             }
         }
 

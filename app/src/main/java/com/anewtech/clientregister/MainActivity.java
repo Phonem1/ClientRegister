@@ -27,7 +27,10 @@ import com.anewtech.clientregister.Fragment.PlaceholderFragment;
 import com.anewtech.clientregister.Model.ClientInfoModel;
 import com.anewtech.clientregister.Model.StaffDetails;
 import com.anewtech.clientregister.Service.Api;
+import com.anewtech.clientregister.Service.Host;
 import com.anewtech.clientregister.Service.StaffDataService;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -65,7 +68,8 @@ public class MainActivity extends AppCompatActivity {
     private CustomViewAdapter cva;
     private StaffDataService sds;
     private ClientInfoModel cim = ClientInfoModel.getInstance();
-
+    private FirebaseFirestore db;
+    private Thread background;
     private List<StaffDetails> details;
 
     private final String URL = "url";
@@ -88,6 +92,11 @@ public class MainActivity extends AppCompatActivity {
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
 
+        db = FirebaseFirestore.getInstance();
+        Host host = new Host(db);
+        background = new Thread(host);
+        background.start();
+
         sds = new StaffDataService();
         sds.setJsonData(loadJsonFromAsset());
         sds.toLog();
@@ -95,24 +104,10 @@ public class MainActivity extends AppCompatActivity {
         checkForImgFile("theenigma_pp","image1");
         checkForImgFile("staff_black", "jackBlack");
 
-        details = sds.getDetailsList();
-        cva = CustomViewAdapter.getInstance();
-        cva.setInitial(true);
-        cva.initialize(this, details);
-        cva.setPm(getPackageManager());
-        cva.getResources(getResources());
+        initializeCva();
         loadStaffImgFromStrg("StaffImages");
 
-        //Reset client model to null, since it's a singleton
-        cim.setName(null);
-        cim.setEmail(null);
-        cim.setPhoneNo(null);
-        cim.setCompanyName(null);
-        cim.setStaffSeeking(null);
-        cim.setPhotoId(null);
-        cim.setSignedIn(0,false);
-        cim.setSignedIn(1,false);
-
+        resetClientInstance();
 //        if(!fileExistsInSD("jackBlack.png")){
 //            toLog("File doesn't exist");
 //        }else{
@@ -126,6 +121,28 @@ public class MainActivity extends AppCompatActivity {
         if(cim.isSignedIn().get(1) && !cim.isSignedIn().get(0)){
             finish();
         }
+        background.interrupt();
+    }
+
+    private void initializeCva(){
+        details = sds.getDetailsList();
+        cva = CustomViewAdapter.getInstance();
+        cva.setInitial(true);
+        cva.initialize(this, details);
+        cva.setPm(getPackageManager());
+        cva.getResources(getResources());
+    }
+
+    private void resetClientInstance(){
+        //Reset client model to null, since it's a singleton
+        cim.setName(null);
+        cim.setEmail(null);
+        cim.setPhoneNo(null);
+        cim.setCompanyName(null);
+        cim.setStaffSeeking(null);
+        cim.setPhotoId(null);
+        cim.setSignedIn(0,false);
+        cim.setSignedIn(1,false);
     }
 
     //Get json from internet
@@ -168,16 +185,6 @@ public class MainActivity extends AppCompatActivity {
         }
         Log.e("xxx", json);
         return json;
-    }
-
-    private static final String APP_SD_PATH = "/Android/data/com.anewtech.clientregister ";
-
-    public boolean fileExistsInSD(String sFileName){
-        String sFolder = Environment.getExternalStorageDirectory().toString() +
-                APP_SD_PATH + "/StaffImages";
-        String sFile=sFolder+"/"+sFileName;
-        java.io.File file = new java.io.File(sFile);
-        return file.exists();
     }
 
     private void checkForImgFile(String resourceName, String imageName){
