@@ -5,7 +5,8 @@
     android:id="@+id/fragment_info_2"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:layout_editor_absoluteY="73dp">
+    tools:layout_editor_absoluteY="73dp"
+    android:descendantFocusability="blocksDescendants">
 
     <TextView
         android:id="@+id/tab2_2_title"
@@ -39,6 +40,7 @@
         android:layout_marginEnd="30dp"
         android:layout_marginStart="30dp"
         android:clickable="true"
+        android:focusable="true"
         app:layout_constraintBottom_toTopOf="@+id/info_nexttab_btn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

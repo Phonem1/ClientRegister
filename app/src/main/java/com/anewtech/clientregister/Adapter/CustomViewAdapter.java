@@ -105,7 +105,7 @@ public class CustomViewAdapter extends BaseAdapter {
         }catch (NullPointerException e){
 //            getCount();
             Toast.makeText(context
-                    ,"Please go back to Welcome tab and sign in.\nErr: Hosts not loaded"
+                    ,"Please go back to Welcome tab and sign in again.\nErr: Hosts not loaded, please give it a sec to load."
                     , Toast.LENGTH_SHORT)
                     .show();
             return 1;
