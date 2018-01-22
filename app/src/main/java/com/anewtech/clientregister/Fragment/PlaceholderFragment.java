@@ -131,7 +131,7 @@ public class PlaceholderFragment extends Fragment {
         //Tab 1...
         final TextView tab1title = mainView.findViewById(R.id.tab1_title);
         if(tab1title != null){
-            if(cim.isSignedIn().get(1)){
+            if(cim.isSignedIn().get(1) && !cim.isSignedIn().get(0)){
                 tab1title.setTextSize(30f);
                 tab1title.setText("Mr/Ms "+cim.getName()+" from "+cim.getCompanyName()+"\n is currently signed in.");
             }else{
@@ -153,7 +153,7 @@ public class PlaceholderFragment extends Fragment {
                     }
                 }
             });
-            if(cim.isSignedIn().get(1)){
+            if(cim.isSignedIn().get(1) && !cim.isSignedIn().get(0)){
                 signIn.setVisibility(View.GONE);
             }else{
                 signIn.setVisibility(View.VISIBLE);
@@ -173,6 +173,7 @@ public class PlaceholderFragment extends Fragment {
                     intent.putExtra("phoneno", cim.getPhoneNo());
                     intent.putExtra("company", cim.getCompanyName());
                     startActivity(intent);
+
                 }
             });
             if(!cim.isSignedIn().get(1)){
@@ -229,7 +230,7 @@ public class PlaceholderFragment extends Fragment {
         if(staffList != null){
             if(cva != null){
                 staffList.setAdapter(cva);
-//                toLog("Adapter set!");
+                toLog("Adapter set!");
             }
             staffList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override

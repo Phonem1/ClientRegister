@@ -1,6 +1,7 @@
 package com.anewtech.clientregister.Service;
 
 import android.content.Context;
+import android.os.Looper;
 import android.os.Process;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -16,6 +17,12 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.reactivex.Observable;
+import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
+
 /**
  * Created by heriz on 17/1/2018.
  */
@@ -26,6 +33,7 @@ public class Host implements Runnable {
 
     List<VisitorModel> details;
     VisitorModel vModel;
+    boolean isReady;
 
     CustomViewAdapter cva = CustomViewAdapter.getInstance();
 
@@ -56,6 +64,10 @@ public class Host implements Runnable {
                                         vModel.name = getName(data);
                                         vModel.imgpath = getPhotoUrl(data);
                                         details.add(vModel);
+                                        toLog("name"+vModel.name);
+
+                                        isReady = true;
+
                                     }
                                 } else {
                                     toLog( "Error getting documents. "+task.getException());
@@ -69,7 +81,14 @@ public class Host implements Runnable {
                 Thread.currentThread().interrupt();
             }
         }
-        cva.initialize(details); //TODO: add observables for details
+        //TODO: add observables for details
+        listObservable(details)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(listObserver());
+//        for(VisitorModel vm : cva.hostdetails){
+//            toLog(vm.name);
+//        }
         toLog("Thread interrupted");
     }
 
@@ -91,6 +110,34 @@ public class Host implements Runnable {
         String photolink = data.substring(btm+8, upp);
         toLog("photo url: "+photolink);
         return photolink;
+    }
+
+    private Observable<List<VisitorModel>> listObservable(List<VisitorModel> list){
+        return Observable.just(list);
+    }
+
+    private Observer<List<VisitorModel>> listObserver(){
+        return new Observer<List<VisitorModel>>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+
+            }
+
+            @Override
+            public void onNext(List<VisitorModel> visitorModels) {
+                cva.initialize(visitorModels);
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+        };
     }
 
     //TODO: create methods to get all other elements in VisitorModel

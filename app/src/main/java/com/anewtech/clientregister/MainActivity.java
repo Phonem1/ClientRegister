@@ -118,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        if(cim.isSignedIn().get(1) && !cim.isSignedIn().get(0)){
+        if(cim.isSignedIn().get(1)){
             finish();
         }
         background.interrupt();
@@ -130,7 +130,6 @@ public class MainActivity extends AppCompatActivity {
         cva.setInitial(true);
         cva.initialize(this, details);
         cva.setPm(getPackageManager());
-        cva.getResources(getResources());
     }
 
     private void resetClientInstance(){
@@ -234,6 +233,7 @@ public class MainActivity extends AppCompatActivity {
         File mypath = new File(getExternalFilesDir("StaffImages"), imageName+".png");
         Bitmap cropSq = cropBitmapToSq(bitmapImage);
         FileOutputStream fos = null;
+
         try{
             fos = new FileOutputStream(mypath);
             //use the compress method on the Bitmap object to write image to the OutputStream
@@ -266,7 +266,9 @@ public class MainActivity extends AppCompatActivity {
     public void loadStaffImgFromStrg(String path){
         String img = "";
         File directory = new File(String.valueOf(getExternalFilesDir(path)));
-
+        String rootpath = directory.getAbsolutePath();
+        cva.setRootpath(rootpath);
+        toLog("rootpath: "+rootpath);
         //Get name of images
         File[] files = directory.listFiles();
         ArrayList<String> images = new ArrayList<>();
@@ -275,11 +277,6 @@ public class MainActivity extends AppCompatActivity {
             images.add(imagenm);
         }
         cva.getListofNames(images);
-        if(directory.exists()){
-            cva.getFileDir(directory);
-        }else{
-            toLog("directory doesn't exist!");
-        }
     }
 
     private void toLog(String msg){
