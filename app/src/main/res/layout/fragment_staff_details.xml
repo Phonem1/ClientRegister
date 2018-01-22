@@ -5,15 +5,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal"
-    android:descendantFocusability="blocksDescendants">
+    android:orientation="horizontal">
 
     <ImageView
         android:id="@+id/staffimg"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingBottom="5dp"
-        android:paddingLeft="5dp"
+        android:paddingStart="5dp"
+        android:paddingEnd="5dp"
         android:paddingTop="5dp"
         app:srcCompat="@drawable/staff_white"
         android:focusable="false"/>
@@ -22,11 +22,9 @@
         android:id="@+id/stafftv"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:autoText="true"
-        android:elegantTextHeight="false"
         android:gravity="center_horizontal|center"
         android:text="Mr. BlackJack"
-        android:textSize="36dp"
+        android:textSize="36sp"
         tools:layout_editor_absoluteX="197dp"
         tools:layout_editor_absoluteY="35dp"
         android:focusable="false"/>
