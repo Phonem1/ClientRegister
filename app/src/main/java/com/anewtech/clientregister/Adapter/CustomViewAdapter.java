@@ -22,6 +22,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.anewtech.clientregister.Model.StaffDetails;
 import com.anewtech.clientregister.Model.VisitorModel;
@@ -73,14 +74,13 @@ public class CustomViewAdapter extends BaseAdapter {
 
     private Context context;
     private List<StaffDetails> staffnames;
-    private List<VisitorModel> hostdetails;
+    public List<VisitorModel> hostdetails;
 
     private int mSelectedItem;
     private boolean initial;
     private boolean isLoadedLocally = false;
     private PackageManager pm;
-    private Resources resources;
-    private File directory;
+    private String rootpath;
     private ArrayList<String> imgNoNamae;
 
     private ViewHolder holder;
@@ -97,7 +97,19 @@ public class CustomViewAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return staffnames.size();
+        try {
+            if (isLoadedLocally) {
+                return staffnames.size();
+            }
+            return hostdetails.size();
+        }catch (NullPointerException e){
+//            getCount();
+            Toast.makeText(context
+                    ,"Please go back to Welcome tab and sign in.\nErr: Hosts not loaded"
+                    , Toast.LENGTH_SHORT)
+                    .show();
+            return 1;
+        }
     }
 
     @Override
@@ -111,7 +123,10 @@ public class CustomViewAdapter extends BaseAdapter {
     }
 
     public String getItemName(int i){
-        return staffnames.get(i).name;
+        if(isLoadedLocally){
+            return staffnames.get(i).name;
+        }
+        return hostdetails.get(i).name;
     }
 
     public int getmSelectedItem() {
@@ -136,14 +151,6 @@ public class CustomViewAdapter extends BaseAdapter {
 
     public void setPm(PackageManager pm) {
         this.pm = pm; // Get from Activity
-    }
-
-    public void getFileDir(File dir){
-        directory = dir;
-    }
-
-    public void getResources(Resources res){
-        resources = res;
     }
 
     @Override
@@ -178,8 +185,9 @@ public class CustomViewAdapter extends BaseAdapter {
 
                     if (j == i) {
                         img = imgNoNamae.get(i);
-
-                        File f = new File("/storage/emulated/0/Android/data/com.anewtech.clientregister/files/StaffImages/" + img);
+                        toLog("rootpath: "+rootpath);
+                        toLog("img: "+img);
+                        File f = new File(rootpath + "/" + img);
                         Picasso.with(context).load(f).into(holder.staffImg);
                     }
                 }
@@ -187,7 +195,18 @@ public class CustomViewAdapter extends BaseAdapter {
         }else {
             //host details from db
             if (hostdetails != null) {
-
+//                for(VisitorModel host : hostdetails){
+//                    String name = host.name;
+//                    String photourl = host.imgpath;
+//                    holder.staffname.setText(name);
+//                    Picasso.with(context).load(photourl).into(holder.staffImg);
+//                }
+                for(int j=0 ; j<hostdetails.size() ; j++){
+                    if(j == i){
+                        holder.staffname.setText(hostdetails.get(i).name);
+                        Picasso.with(context).load(hostdetails.get(i).imgpath).into(holder.staffImg);
+                    }
+                }
             }
         }
 
@@ -196,6 +215,10 @@ public class CustomViewAdapter extends BaseAdapter {
 
     public void getListofNames(ArrayList<String> names){
         imgNoNamae = names;
+    }
+
+    public void setRootpath(String rootpath) {
+        this.rootpath = rootpath;
     }
 
     private void toLog(String msg){
